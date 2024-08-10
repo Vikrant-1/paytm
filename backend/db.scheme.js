@@ -3,9 +3,9 @@ const mongoose = require("mongoose");
 mongoose.connect("mongoose://localhost:27017/paytm")
 // create a Schema for user
 const UserScehma = new mongoose.Schema({
-  userName: String,
-  firstName: String,
-  lastName: String,
+  username: String,
+  firstname: String,
+  lastname: String,
   password: String,
 });
 
