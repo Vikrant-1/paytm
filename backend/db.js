@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 
 const UserSchema = new mongoose.Schema(
   {
@@ -32,6 +33,27 @@ const UserSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Validating the candidate password with stored hash and hash function
+UserSchema.methods.validatePassword = async function (candidatePassword) {
+  try {
+    return await bcrypt.compare(candidatePassword, this.password);
+  } catch (error) {
+    throw new Error("Password validation failed");
+  }
+};
+
+UserSchema.pre("save", async function (next) {
+  if (this.isModified("password") || this.isNew) {
+    try {
+      const salt = await bcrypt.genSalt(10);
+      this.password = await bcrypt.hash(this.password, salt);
+    } catch (error) {
+      next(error);
+    }
+  } else {
+    return next();
+  }
+});
 const User = mongoose.model("User", UserSchema);
 
 module.exports = {
