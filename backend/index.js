@@ -1,7 +1,17 @@
 const express = require("express");
-const router = express.Router();
+const cors = require("cors");
 const app = express();
-const mainRoute = require('./routes/index');
 
-// route import
-router.use('/api/v1', mainRoute);
+// add cors and body parser
+// we can also set size and type
+app.use(cors());
+app.use(express.json());
+
+// route imports
+const router = express.Router();
+const mainRoute = require("./routes/index");
+
+// main route
+router.use("/api/v1", mainRoute);
+
+app.listen(3000);
