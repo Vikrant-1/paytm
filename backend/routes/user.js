@@ -126,4 +126,49 @@ router.post("/signin", async (req, res) => {
   }
 });
 
+// update user details
+
+const updateSchema = zod.object({
+  firstname: zod.string().max(50).optional(),
+  lastname: zod.string().max(50).optional(),
+  password: zod.string().min(6).optional(),
+});
+
+router.put("/", async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { firstname, lastname, password } = req.body;
+
+    // zod check
+    const zodCheck = updateSchema.safeParse(req.body);
+
+    if (!zodCheck.success) {
+      res.status(401).json({
+        message: "Invalid data",
+        type: ERROR,
+      });
+    }
+
+    // check user exists or not
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        message: "User did't exsist",
+      });
+    }
+    if (firstname) user.firstname = firstname;
+    if (lastname) user.lastname = lastname;
+    if (password) user.password = password;
+
+    await user.save();
+    res.status(200).json({
+      message: "User updated Successfully !!",
+    });
+  } catch (error) {
+    res.status(401).json({
+      message: "Failed to Update User details",
+    });
+  }
+});
+
 module.exports = router;
