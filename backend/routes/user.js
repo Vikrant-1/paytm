@@ -5,6 +5,7 @@ const router = express.Router();
 const { User } = require("../db/users.db");
 const { JWT_SECRET } = require("../config");
 const { ERROR } = require("../contents");
+const { Accounts } = require("../db/accounts.db");
 
 // signup route
 const signupSchema = zod.object({
@@ -46,6 +47,11 @@ router.post("/signup", async (req, res) => {
     });
     await newUser.save();
 
+    // add random account balance
+    const account = await Accounts.create({
+      userId: userCheck?._id,
+      balance: 1 + Math.random() * 10000,
+    });
     // sign token
     const token = jwt.sign({ userId: newUser._id }, JWT_SECRET);
     res.status(201).json({
@@ -58,6 +64,7 @@ router.post("/signup", async (req, res) => {
         userId: newUser._id,
         createdAt: newUser.createdAt,
         updatedAt: newUser.updatedAt,
+        balance: account.balance,
       },
     });
   } catch (error) {
