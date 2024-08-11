@@ -171,4 +171,44 @@ router.put("/", async (req, res) => {
   }
 });
 
+// filter out users
+
+router.get("/bulk", async (req, res) => {
+  try {
+    const { filter = "" } = req.query;
+
+    const users = await User.find({
+      $or: [
+        {
+          firstname: {
+            $regex: filter,
+            $options: "i",
+          },
+        },
+        {
+          lastname: {
+            $regex: filter,
+            $options: "i",
+          },
+        },
+      ],
+    });
+
+    res.status(200).json({
+      message: "Fetched users successfully",
+      data: users.map((user) => ({
+        userId: user._id,
+        username: user.username,
+        firstname: user.firstname,
+        lastname: user.lastname,
+      })),
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+});
+
 module.exports = router;
