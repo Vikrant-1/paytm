@@ -2,7 +2,7 @@ const express = require("express");
 const zod = require("zod");
 const jwt = require("jsonwebtoken");
 const router = express.Router();
-const { User } = require("../db");
+const { User } = require("../db/users.db");
 const { JWT_SECRET } = require("../config");
 const { ERROR } = require("../contents");
 
