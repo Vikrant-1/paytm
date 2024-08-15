@@ -16,6 +16,8 @@ const signupSchema = zod.object({
 });
 
 router.post("/signup", async (req, res) => {
+  console.log('start');
+  
   try {
     // get params
     const { username, firstname, lastname, password } = req.body;
@@ -49,7 +51,7 @@ router.post("/signup", async (req, res) => {
 
     // add random account balance
     const account = await Accounts.create({
-      userId: userCheck?._id,
+      userId: newUser?._id,
       balance: 1 + Math.random() * 10000,
     });
     // sign token

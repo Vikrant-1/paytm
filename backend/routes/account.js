@@ -8,8 +8,8 @@ const router = express.Router();
 // get user balance
 router.get("/balance", authMiddleware, async (req, res) => {
   try {
-    const userId = req.userId;
-    const account = await Accounts.findById(userId);
+    const userId = (new mongoose.Types.ObjectId(req.userId))._id;
+    const account = await Accounts.findOne({ userId });    
 
     res.status(200).json({
       message: "Succesfully get the balance",
@@ -40,11 +40,11 @@ router.post("/transfer", authMiddleware, async (req, res) => {
     }
 
     // check user bank balance
-    const myAccount = await Accounts.findById(userId).session(session);
+    const myAccount = await Accounts.findOne({ userId }).session(session);
 
     if (!myAccount || myAccount.balance < amount) {
-      session.abortTransaction();
-      res.status(400).json({
+     await session.abortTransaction();
+      return res.status(400).json({
         message: "Insufficient balance",
       });
     }
@@ -53,8 +53,8 @@ router.post("/transfer", authMiddleware, async (req, res) => {
     const toAccount = await Accounts.findOne({ userId: to }).session(session);
 
     if (!toAccount) {
-      session.abortTransaction();
-      res.status(400).json({
+     await session.abortTransaction();
+      return res.status(400).json({
         message: "Invalid Account",
       });
     }
@@ -77,14 +77,14 @@ router.post("/transfer", authMiddleware, async (req, res) => {
       }
     ).session(session);
 
-    session.commitTransaction();
+   await session.commitTransaction();
     res.status(200).json({
       message: "Transfer successful",
     });
   } catch (error) {
-    session.abortTransaction();
+   await session.abortTransaction();
   } finally {
-    session.endSession();
+   await session.endSession();
   }
 });
 
