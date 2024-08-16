@@ -6,7 +6,7 @@ function Dashboard() {
   return (
     <div>
       <Appbar />
-      <BalanceComponent />
+      <BalanceComponent value={"Rs 10,000"} />
       <Users />
     </div>
   );
